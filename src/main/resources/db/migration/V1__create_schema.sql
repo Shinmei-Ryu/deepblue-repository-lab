@@ -15,12 +15,13 @@ CREATE TABLE rescue_cases{
     case_code VARCHAR(100) NOT NULL,
     rescue_date DATE NOT NULL,
     rescue_location VARCHAR(100) NOT NULL,
-    status VARCHAR(20) NOT NULL
+    status VARCHAR(30) NOT NULL
 
 
     CONSTRAINT PK_rescue_centers_id PRIMARY KEY (id),
-    CONSTRAINT FK_rescue_case_rescue_center_id FOREIGN KEY (rescue_center_id),
-    CONSTRAINT UQ_rescue_case_code UNIQUE (case_code)
+    CONSTRAINT FK_rescue_cases_rescue_center_id FOREIGN KEY (rescue_center_id),
+    CONSTRAINT UQ_rescue_cases_code UNIQUE (case_code),
+    CONSTRAINT CHK_rescue_cases_status CHECK (status IN ('ADMITTED', 'UNDER_EVALUATION', 'IN_REHABILITATION', 'READY_FOR_RELEASE', 'RELEASED', 'CLOSED'))
 
     };
 
@@ -30,7 +31,7 @@ CREATE TABLE animal{
     common_name VARCHAR(100) NOT NULL,
     scientific_name VARCHAR(100) NOT NULL,
     sex VARCHAR(100) NOT NULL,
-    rescue_center_id BIGINT
+    rescue_case_id BIGINT
 
     CONSTRAINT PK_animal_id PRIMARY KEY (id),
     CONSTRAINT FK_animal_rescue_case_id FOREIGN KEY (rescue_center_id),
