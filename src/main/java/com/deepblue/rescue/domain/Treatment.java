@@ -64,4 +64,28 @@ public class Treatment {
     public String getDescription() {
         return description;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setAnimal(Animal animal) {
+        this.animal = animal;
+    }
+
+    public void setSpecialist(Specialist specialist) {
+        this.specialist = specialist;
+    }
+
+    public void setPerformedAt(LocalDateTime performedAt) {
+        this.performedAt = performedAt;
+    }
+
+    public void setType(TreatmentType type) {
+        this.type = type;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }

@@ -37,4 +37,16 @@ public class Expertise {
     public Set<Specialist> getSpecialists() {
         return specialists;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setSpecialists(Set<Specialist> specialists) {
+        this.specialists = specialists;
+    }
 }

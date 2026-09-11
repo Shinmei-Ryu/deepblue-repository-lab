@@ -74,4 +74,32 @@ public class RescueCase {
     public Animal getAnimal() {
         return animal;
     }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setRescueCenter(RescueCenter rescueCenter) {
+        this.rescueCenter = rescueCenter;
+    }
+
+    public void setCaseCode(String caseCode) {
+        this.caseCode = caseCode;
+    }
+
+    public void setRescueDate(LocalDate rescueDate) {
+        this.rescueDate = rescueDate;
+    }
+
+    public void setRescueLocation(String rescueLocation) {
+        this.rescueLocation = rescueLocation;
+    }
+
+    public void setStatus(RescueStatus status) {
+        this.status = status;
+    }
+
+    public void setAnimal(Animal animal) {
+        this.animal = animal;
+    }
 }

@@ -53,4 +53,24 @@ public class RescueCenter {
     public List<RescueCase> getCases() {
         return cases;
     }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public void setCases(List<RescueCase> cases) {
+        this.cases = cases;
+    }
 }

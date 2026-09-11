@@ -40,7 +40,8 @@ public class Animal {
     private List<Treatment> treatments;
 
 
-    public Animal() {}
+    public Animal() {
+    }
 
     public Animal(String animalCode, String commonName, String scientificName, AnimalSex sex) {
         this.animalCode = animalCode;
@@ -79,5 +80,37 @@ public class Animal {
 
     public List<Treatment> getTreatments() {
         return treatments;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setAnimalCode(String animalCode) {
+        this.animalCode = animalCode;
+    }
+
+    public void setCommonName(String commonName) {
+        this.commonName = commonName;
+    }
+
+    public void setScientificName(String scientificName) {
+        this.scientificName = scientificName;
+    }
+
+    public void setSex(AnimalSex sex) {
+        this.sex = sex;
+    }
+
+    public void setRescueCase(RescueCase rescueCase) {
+        this.rescueCase = rescueCase;
+    }
+
+    public void setMedicalRecord(MedicalRecord medicalRecord) {
+        this.medicalRecord = medicalRecord;
+    }
+
+    public void setTreatments(List<Treatment> treatments) {
+        this.treatments = treatments;
     }
 }

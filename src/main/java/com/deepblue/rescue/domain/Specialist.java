@@ -82,4 +82,36 @@ public class Specialist {
     public List<Treatment> getTreatments() {
         return treatments;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setProfessionalCode(String professionalCode) {
+        this.professionalCode = professionalCode;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
+
+    public void setExpertiseAreas(Set<Expertise> expertiseAreas) {
+        this.expertiseAreas = expertiseAreas;
+    }
+
+    public void setTreatments(List<Treatment> treatments) {
+        this.treatments = treatments;
+    }
 }
