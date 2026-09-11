@@ -130,7 +130,9 @@ public class PersistenceIntegrationTest {
 
         MedicalRecord record = new MedicalRecord(new BigDecimal("28.40"), "STABLE");
         record.setInjuries("Left front flipper injury");
+        record.setObservation("Under observation");
         animal.assignMedicalRecord(record);
+
 
         rescueCenterRepository.save(center);
 
@@ -233,7 +235,7 @@ public class PersistenceIntegrationTest {
 
         assertThat(traumaSpecialists)
                 .extracting(Specialist::getFirstName)
-                .containsExactly("Elena", "Sofia");
+                .containsExactly("Sofia", "Elena");
     }
 
     // Test 9: insercion de tratamientos y jpql para encontrar por id y ordenar

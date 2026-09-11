@@ -19,7 +19,7 @@ public class RescueCase {
     @Column(name = "case_code", unique = true, nullable = false, length = 100)
     private String caseCode;
 
-    @Column(name = "recue_date", nullable = false)
+    @Column(name = "rescue_date", nullable = false)
     private LocalDate rescueDate;
 
     @Column(name = "rescue_location", nullable = false, length = 100)

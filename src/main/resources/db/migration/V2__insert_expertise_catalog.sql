@@ -1,5 +1,5 @@
 
-NSERT INTO expertise (name) VALUES
+INSERT INTO expertise (name) VALUES
     ('Marine Reptiles'),
     ('Marine Mammals'),
     ('Marine Birds'),

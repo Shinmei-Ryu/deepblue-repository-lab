@@ -22,7 +22,7 @@ public class RescueCenter {
     @Column(nullable = false)
     private String city;
 
-    @OneToMany(mappedBy = "rescueCenter")
+    @OneToMany(mappedBy = "rescueCenter", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RescueCase> cases = new ArrayList<>();
 
     public RescueCenter() {

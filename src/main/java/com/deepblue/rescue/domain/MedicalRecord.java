@@ -26,7 +26,7 @@ public class MedicalRecord {
     private String injuries;
 
     @Column(columnDefinition = "TEXT")
-    private String observations;
+    private String observation;
 
     public MedicalRecord() {
     }
@@ -40,7 +40,7 @@ public class MedicalRecord {
         this.initialWeight = initialWeight;
         this.initialCondition = initialCondition;
         this.injuries = injuries;
-        this.observations = observations;
+        this.observation = observations;
     }
 
     public Long getId() {
@@ -63,8 +63,8 @@ public class MedicalRecord {
         return injuries;
     }
 
-    public String getObservations() {
-        return observations;
+    public String getObservation() {
+        return observation;
     }
 
     public void setId(Long id) {
@@ -87,7 +87,7 @@ public class MedicalRecord {
         this.injuries = injuries;
     }
 
-    public void setObservations(String observations) {
-        this.observations = observations;
+    public void setObservation(String observations) {
+        this.observation = observations;
     }
 }
