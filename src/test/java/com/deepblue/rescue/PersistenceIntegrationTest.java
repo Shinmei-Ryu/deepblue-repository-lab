@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Testcontainers
 @SpringBootTest
@@ -295,5 +297,28 @@ public class PersistenceIntegrationTest {
         assertThat(result)
                 .extracting(Treatment::getDescription)
                 .containsExactly("Middle");
+    }
+
+    // Test 11: Test UNIQUE constraint
+    @Test
+    void savingDuplicateAnimalCodeShouldViolateUniqueConstraint() {
+        RescueCenter center = new RescueCenter("DB-UNQ", "DeepBlue Unique Center", "Santa Marta");
+        rescueCenterRepository.save(center);
+
+        RescueCase case1 = new RescueCase("RES-UNQ-01", LocalDate.of(2026, 6, 10), "Zona A", RescueStatus.ADMITTED);
+        RescueCase case2 = new RescueCase("RES-UNQ-02", LocalDate.of(2026, 6, 11), "Zona B", RescueStatus.ADMITTED);
+        center.addCase(case1);
+        center.addCase(case2);
+        rescueCaseRepository.saveAll(List.of(case1, case2));
+
+        Animal firstAnimal = new Animal("AN-100", "Green Sea Turtle", "Chelonia mydas", AnimalSex.FEMALE);
+        case1.assignAnimal(firstAnimal);
+        animalRepository.saveAndFlush(firstAnimal);
+
+        Animal duplicateAnimal = new Animal("AN-100", "Hawksbill Turtle", "Eretmochelys imbricata", AnimalSex.MALE);
+        case2.assignAnimal(duplicateAnimal);
+
+        assertThrows(DataIntegrityViolationException.class,
+                () -> animalRepository.saveAndFlush(duplicateAnimal));
     }
 }
