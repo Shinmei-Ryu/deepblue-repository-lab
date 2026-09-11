@@ -203,4 +203,33 @@ public class PersistenceIntegrationTest {
                 .containsExactly("AN-CAR-01")
                 .doesNotContain("AN-PAC-01");
     }
+
+    // Test 8: @Query JPQL especialistas
+    @Test
+    void findActiveByExpertiseShouldReturnOnlySpecialistsWithTrauma() {
+        Expertise trauma = expertiseRepository.findByNameIgnoreCase("Trauma").orElseThrow();
+        Expertise rehabilitation = expertiseRepository.findByNameIgnoreCase("Rehabilitation").orElseThrow();
+        Expertise marineMammals = expertiseRepository.findByNameIgnoreCase("Marine Mammals").orElseThrow();
+        Expertise marineBirds = expertiseRepository.findByNameIgnoreCase("Marine Birds").orElseThrow();
+
+        Specialist elena = new Specialist("SPEC-910", "Elena", "Vargas", "elena.910@deepblue.org",true);
+        elena.addExpertise(trauma);
+        elena.addExpertise(rehabilitation);
+
+        Specialist mateo = new Specialist("SPEC-911", "Mateo", "Restrepo", "mateo.911@deepblue.org",true);
+        mateo.addExpertise(marineMammals);
+        mateo.addExpertise(rehabilitation);
+
+        Specialist sofia = new Specialist("SPEC-912", "Sofia", "Londono", "sofia.912@deepblue.org",true);
+        sofia.addExpertise(marineBirds);
+        sofia.addExpertise(trauma);
+
+        specialistRepository.saveAll(List.of(elena, mateo, sofia));
+
+        List<Specialist> traumaSpecialists = specialistRepository.findActiveByExpertise("trauma");
+
+        assertThat(traumaSpecialists)
+                .extracting(Specialist::getFirstName)
+                .containsExactly("Elena", "Sofia");
+    }
 }
