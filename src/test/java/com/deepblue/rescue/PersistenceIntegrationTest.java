@@ -14,6 +14,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
@@ -231,5 +232,37 @@ public class PersistenceIntegrationTest {
         assertThat(traumaSpecialists)
                 .extracting(Specialist::getFirstName)
                 .containsExactly("Elena", "Sofia");
+    }
+
+    // Test 9: insercion de tratamientos y jpql para intervalos
+    @Test
+    void treatmentsForAnimalShouldBeOrderedChronologically() {
+        RescueCenter center = new RescueCenter("DB-TRT", "DeepBlue Treatment Center", "Santa Marta");
+        rescueCenterRepository.save(center);
+
+        RescueCase rescueCase = new RescueCase("RES-TRT-01", LocalDate.of(2026, 6, 1),
+                "Zona X", RescueStatus.IN_REHABILITATION);
+        center.addCase(rescueCase);
+        Animal animal = new Animal("AN-TRT-01", "Green Sea Turtle", "Chelonia mydas", AnimalSex.FEMALE);
+        rescueCase.assignAnimal(animal);
+        rescueCaseRepository.save(rescueCase);
+
+        Specialist elena = new Specialist("SPEC-920", "Elena", "Vargas", "elena.920@deepblue.org",true);
+        Specialist mateo = new Specialist("SPEC-921", "Mateo", "Restrepo", "mateo.921@deepblue.org",true);
+        specialistRepository.saveAll(List.of(elena, mateo));
+
+        Treatment treatment1 = new Treatment(animal, elena,
+                LocalDateTime.of(2026, 6, 2, 9, 0), TreatmentType.WOUND_CARE, "Treatment 1");
+        Treatment treatment2 = new Treatment(animal, elena,
+                LocalDateTime.of(2026, 6, 3, 9, 0), TreatmentType.HYDRATION, "Treatment 2");
+        Treatment treatment3 = new Treatment(animal, mateo,
+                LocalDateTime.of(2026, 6, 4, 9, 0), TreatmentType.OBSERVATION, "Treatment 3");
+        treatmentRepository.saveAll(List.of(treatment1, treatment2, treatment3));
+
+        List<Treatment> treatments = treatmentRepository.findByAnimalIdOrderByPerformedAtAsc(animal.getId());
+
+        assertThat(treatments)
+                .extracting(Treatment::getDescription)
+                .containsExactly("Treatment 1", "Treatment 2", "Treatment 3");
     }
 }

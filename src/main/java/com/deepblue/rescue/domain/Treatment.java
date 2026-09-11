@@ -34,11 +34,12 @@ public class Treatment {
     public Treatment() {
     }
 
-    public Treatment(Animal animal, Specialist specialist, LocalDateTime performedAt, TreatmentType type) {
+    public Treatment(Animal animal, Specialist specialist, LocalDateTime performedAt, TreatmentType type, String description) {
         this.animal = animal;
         this.specialist = specialist;
         this.performedAt = performedAt;
         this.type = type;
+        this.description = description;
     }
 
     public Long getId() {
