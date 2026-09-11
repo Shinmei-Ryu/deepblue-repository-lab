@@ -1,9 +1,7 @@
 package com.deepblue.rescue;
 
 
-import com.deepblue.rescue.domain.RescueCase;
-import com.deepblue.rescue.domain.RescueCenter;
-import com.deepblue.rescue.domain.RescueStatus;
+import com.deepblue.rescue.domain.*;
 import com.deepblue.rescue.repository.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +12,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.*;
@@ -91,5 +90,48 @@ public class PersistenceIntegrationTest {
 
         RescueCenter retrieved = rescueCenterRepository.findById(center.getId()).get();
         assertThat(retrieved.getCases()).hasSize(2);
+    }
+
+    // Test 3: Relación 1:1 RescueCase-Animal
+    @Test
+    void testOneToOneRescueCaseAnimal() {
+        RescueCenter center = new RescueCenter("DB-ANIM", "Animal Center", "Test");
+        RescueCase rescueCase = new RescueCase("RES-2026-001", LocalDate.of(2026, 8, 18),
+                "Bahía Concha", RescueStatus.IN_REHABILITATION);
+        center.addCase(rescueCase);
+
+        Animal animal = new Animal("AN-2026-001", "Green Sea Turtle", "Chelonia mydas", AnimalSex.FEMALE);
+        rescueCase.assignAnimal(animal);
+
+        rescueCenterRepository.save(center);
+
+        RescueCase retrieved = rescueCaseRepository.findById(rescueCase.getId()).get();
+        assertThat(retrieved.getAnimal()).isNotNull();
+        assertThat(retrieved.getAnimal().getCommonName()).isEqualTo("Green Sea Turtle");
+
+        Animal retrievedAnimal = animalRepository.findById(animal.getId()).get();
+        assertThat(retrievedAnimal.getRescueCase()).isNotNull();
+        assertThat(retrievedAnimal.getRescueCase().getCaseCode()).isEqualTo("RES-2026-001");
+    }
+
+    // Test 4: Relación 1:1 Animal-MedicalRecord
+    @Test
+    void testOneToOneAnimalMedicalRecord() {
+        RescueCenter center = new RescueCenter("DB-MED", "Medical Center", "Test");
+        RescueCase rescueCase = new RescueCase("RES-MED-001", LocalDate.now(), "Location", RescueStatus.ADMITTED);
+        center.addCase(rescueCase);
+
+        Animal animal = new Animal("AN-MED-001", "Dolphin", "Tursiops", AnimalSex.UNKNOWN);
+        rescueCase.assignAnimal(animal);
+
+        MedicalRecord record = new MedicalRecord(new BigDecimal("28.40"), "STABLE");
+        record.setInjuries("Left front flipper injury");
+        animal.assignMedicalRecord(record);
+
+        rescueCenterRepository.save(center);
+
+        Animal retrieved = animalRepository.findById(animal.getId()).get();
+        assertThat(retrieved.getMedicalRecord()).isNotNull();
+        assertThat(retrieved.getMedicalRecord().getInitialWeight()).isEqualByComparingTo(new BigDecimal("28.40"));
     }
 }
