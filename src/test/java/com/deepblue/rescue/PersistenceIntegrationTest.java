@@ -1,6 +1,8 @@
 package com.deepblue.rescue;
 
 
+import com.deepblue.rescue.repository.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,5 +24,24 @@ public class PersistenceIntegrationTest {
                     .withUsername("deepblue")
                     .withPassword("deepblue");
 
-    
+    @Autowired
+    private RescueCenterRepository rescueCenterRepository;
+
+    @Autowired
+    private RescueCaseRepository rescueCaseRepository;
+
+    @Autowired
+    private AnimalRepository animalRepository;
+
+    @Autowired
+    private MedicalRecordRepository medicalRecordRepository;
+
+    @Autowired
+    private SpecialistRepository specialistRepository;
+
+    @Autowired
+    private ExpertiseRepository expertiseRepository;
+
+    @Autowired
+    private TreatmentRepository treatmentRepository;
 }
