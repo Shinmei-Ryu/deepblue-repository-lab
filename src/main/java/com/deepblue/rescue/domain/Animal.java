@@ -30,14 +30,14 @@ public class Animal {
     @JoinColumn(name = "rescue_case_id", unique = true, nullable = false)
     private RescueCase rescueCase;
 
-    @OneToOne(mappedBy = "animal",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "animal", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private MedicalRecord medicalRecord;
 
     @OneToMany(mappedBy = "animal")
     private List<Treatment> treatments;
+
+    @Column(name = "tracking_device_code", unique = true, length = 50)
+    private String trackingDeviceCode;
 
 
     public Animal() {
@@ -117,5 +117,13 @@ public class Animal {
 
     public void setTreatments(List<Treatment> treatments) {
         this.treatments = treatments;
+    }
+
+    public String getTrackingDeviceCode() {
+        return trackingDeviceCode;
+    }
+
+    public void setTrackingDeviceCode(String trackingDeviceCode) {
+        this.trackingDeviceCode = trackingDeviceCode;
     }
 }
