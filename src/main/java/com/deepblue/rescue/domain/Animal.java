@@ -36,6 +36,9 @@ public class Animal {
             fetch = FetchType.LAZY)
     private MedicalRecord medicalRecord;
 
+    @OneToMany(mappedBy = "animal")
+    private List<Treatment> treatments;
+
 
     public Animal() {}
 
@@ -74,5 +77,7 @@ public class Animal {
         return medicalRecord;
     }
 
-
+    public List<Treatment> getTreatments() {
+        return treatments;
+    }
 }
