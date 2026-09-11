@@ -174,4 +174,33 @@ public class PersistenceIntegrationTest {
                 .extracting(RescueCase::getCaseCode)
                 .containsExactly("RES-001", "RES-003");
     }
+
+    // Test 7: Query Method navegando relaciones
+    @Test
+    void findByRescueCaseRescueCenterCodeShouldOnlyReturnAnimalsFromThatCenter() {
+        RescueCenter caribbean = new RescueCenter("DB-CAR", "DeepBlue Caribbean", "Santa Marta");
+        RescueCenter pacific = new RescueCenter("DB-PAC", "DeepBlue Pacific", "Buenaventura");
+        rescueCenterRepository.saveAll(List.of(caribbean, pacific));
+
+        RescueCase caseCar = new RescueCase("RES-CAR-01", LocalDate.of(2026, 5, 1),
+                "Bahía Concha", RescueStatus.ADMITTED);
+        caribbean.addCase(caseCar);
+        Animal animalCar = new Animal("AN-CAR-01", "Green Sea Turtle", "Chelonia mydas", AnimalSex.FEMALE);
+        caseCar.assignAnimal(animalCar);
+        rescueCaseRepository.save(caseCar);
+
+        RescueCase casePac = new RescueCase("RES-PAC-01", LocalDate.of(2026, 5, 2),
+                "Bahía Málaga", RescueStatus.ADMITTED);
+        pacific.addCase(casePac);
+        Animal animalPac = new Animal("AN-PAC-01", "Olive Ridley Turtle", "Lepidochelys olivacea", AnimalSex.MALE);
+        casePac.assignAnimal(animalPac);
+        rescueCaseRepository.save(casePac);
+
+        List<Animal> animalsFromCaribbean = animalRepository.findByRescueCaseRescueCenterCode("DB-CAR");
+
+        assertThat(animalsFromCaribbean)
+                .extracting(Animal::getAnimalCode)
+                .containsExactly("AN-CAR-01")
+                .doesNotContain("AN-PAC-01");
+    }
 }
