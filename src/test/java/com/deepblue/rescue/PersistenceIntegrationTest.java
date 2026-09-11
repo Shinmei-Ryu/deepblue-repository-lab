@@ -14,6 +14,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -149,5 +150,28 @@ public class PersistenceIntegrationTest {
 
         Specialist retrieved = specialistRepository.findById(elena.getId()).get();
         assertThat(retrieved.getExpertiseAreas()).hasSize(2);
+    }
+
+    // Test 6: Query Method simple
+    @Test
+    void findByStatusShouldReturnMatchingRescueCases() {
+        RescueCenter center = new RescueCenter("DB-QM1", "DeepBlue QM Center", "Santa Marta");
+        rescueCenterRepository.save(center);
+
+        RescueCase res1 = new RescueCase("RES-001", LocalDate.of(2026, 4, 1), "Zona 1", RescueStatus.IN_REHABILITATION);
+        RescueCase res2 = new RescueCase("RES-002", LocalDate.of(2026, 4, 2), "Zona 2", RescueStatus.READY_FOR_RELEASE);
+        RescueCase res3 = new RescueCase("RES-003", LocalDate.of(2026, 4, 3), "Zona 3", RescueStatus.IN_REHABILITATION);
+        center.addCase(res1);
+        center.addCase(res2);
+        center.addCase(res3);
+        rescueCaseRepository.saveAll(List.of(res1, res2, res3));
+
+        List<RescueCase> inRehabilitation =
+                rescueCaseRepository.findByStatusOrderByRescueDateAsc(RescueStatus.IN_REHABILITATION);
+
+        assertThat(inRehabilitation).hasSize(2);
+        assertThat(inRehabilitation)
+                .extracting(RescueCase::getCaseCode)
+                .containsExactly("RES-001", "RES-003");
     }
 }
