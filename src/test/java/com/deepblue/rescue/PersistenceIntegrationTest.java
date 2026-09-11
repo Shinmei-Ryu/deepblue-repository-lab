@@ -1,7 +1,9 @@
 package com.deepblue.rescue;
 
 
+import com.deepblue.rescue.domain.RescueCenter;
 import com.deepblue.rescue.repository.*;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -9,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
+
+import static org.assertj.core.api.Assertions.*;
 
 @Testcontainers
 @SpringBootTest
@@ -44,4 +48,27 @@ public class PersistenceIntegrationTest {
 
     @Autowired
     private TreatmentRepository treatmentRepository;
+
+    // Test 1: Métodos heredados
+    @Test
+    void testInheritedMethods() {
+        RescueCenter center = new RescueCenter("DB-CAR", "DeepBlue Caribbean", "Santa Marta");
+
+        // save
+        RescueCenter saved = rescueCenterRepository.save(center);
+        assertThat(saved.getId()).isNotNull();
+
+        // findById
+        var retrieved = rescueCenterRepository.findById(saved.getId());
+        assertThat(retrieved).isPresent();
+        assertThat(retrieved.get().getCode()).isEqualTo("DB-CAR");
+
+        // existsById
+        boolean exists = rescueCenterRepository.existsById(saved.getId());
+        assertThat(exists).isTrue();
+
+        // count
+        long count = rescueCenterRepository.count();
+        assertThat(count).isGreaterThan(0);
+    }
 }
