@@ -134,4 +134,20 @@ public class PersistenceIntegrationTest {
         assertThat(retrieved.getMedicalRecord()).isNotNull();
         assertThat(retrieved.getMedicalRecord().getInitialWeight()).isEqualByComparingTo(new BigDecimal("28.40"));
     }
+
+    // Test 5: Relación N:M
+    @Test
+    void testManyToManyRelationship() {
+        Expertise trauma = expertiseRepository.findByNameIgnoreCase("Trauma").get();
+        Expertise rehab = expertiseRepository.findByNameIgnoreCase("Rehabilitation").get();
+
+        Specialist elena = new Specialist("SPEC-001", "Elena", "Vargas", "elena@deepblue.org", true);
+        elena.addExpertise(trauma);
+        elena.addExpertise(rehab);
+
+        specialistRepository.save(elena);
+
+        Specialist retrieved = specialistRepository.findById(elena.getId()).get();
+        assertThat(retrieved.getExpertiseAreas()).hasSize(2);
+    }
 }
