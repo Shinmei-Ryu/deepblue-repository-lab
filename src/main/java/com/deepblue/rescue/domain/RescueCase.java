@@ -12,6 +12,10 @@ public class RescueCase {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "rescue_center_id", nullable = false)
+    private RescueCenter rescueCenter;
+
     @Column(name = "case_code", unique = true, nullable = false, length = 100)
     private String caseCode;
 
@@ -24,10 +28,6 @@ public class RescueCase {
     @Column(nullable = false, length = 30)
     @Enumerated(EnumType.STRING)
     private RescueStatus status;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "rescue_center_id", nullable = false)
-    private RescueCenter rescueCenter;
 
     @OneToOne(
             mappedBy = "rescueCase",
