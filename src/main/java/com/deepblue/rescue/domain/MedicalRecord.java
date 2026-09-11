@@ -36,6 +36,13 @@ public class MedicalRecord {
         this.initialCondition = initialCondition;
     }
 
+    public MedicalRecord(BigDecimal initialWeight, String initialCondition, String injuries, String observations) {
+        this.initialWeight = initialWeight;
+        this.initialCondition = initialCondition;
+        this.injuries = injuries;
+        this.observations = observations;
+    }
+
     public Long getId() {
         return id;
     }

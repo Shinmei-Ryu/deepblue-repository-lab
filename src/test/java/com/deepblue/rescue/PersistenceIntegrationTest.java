@@ -321,4 +321,87 @@ public class PersistenceIntegrationTest {
         assertThrows(DataIntegrityViolationException.class,
                 () -> animalRepository.saveAndFlush(duplicateAnimal));
     }
+
+    @Test
+    void fullIntegratorScenarioShouldPersistGraphAndAnswerAllQueries() {
+        // ---- Centro ----
+        RescueCenter center = new RescueCenter("DB-CAR", "DeepBlue Caribbean", "Santa Marta");
+        rescueCenterRepository.save(center);
+
+        // ---- Caso ----
+        RescueCase rescueCase = new RescueCase(
+                "RES-2026-100", LocalDate.of(2026, 8, 18), "Bahía Concha", RescueStatus.IN_REHABILITATION);
+        center.addCase(rescueCase);
+
+        // ---- Animal ----
+        Animal animal = new Animal("AN-2026-100", "Green Sea Turtle", "Chelonia mydas", AnimalSex.FEMALE);
+        rescueCase.assignAnimal(animal);
+        rescueCaseRepository.save(rescueCase); // cascada: RescueCase -> Animal
+
+        // ---- Expediente médico ----
+        MedicalRecord medicalRecord = new MedicalRecord(
+                new BigDecimal("27.80"), "STABLE",
+                "Injury caused by fishing net", "Possible plastic ingestion");
+        animal.assignMedicalRecord(medicalRecord);
+        animalRepository.save(animal); // cascada: Animal -> MedicalRecord
+
+        // ---- Especialista ----
+        Expertise marineReptiles = expertiseRepository.findByNameIgnoreCase("Marine Reptiles").orElseThrow();
+        Expertise trauma = expertiseRepository.findByNameIgnoreCase("Trauma").orElseThrow();
+        Expertise rehabilitation = expertiseRepository.findByNameIgnoreCase("Rehabilitation").orElseThrow();
+
+        Specialist elena = new Specialist("SPEC-001", "Elena", "Vargas", "elena@deepblue.org",true);
+        elena.addExpertise(marineReptiles);
+        elena.addExpertise(trauma);
+        elena.addExpertise(rehabilitation);
+        specialistRepository.save(elena);
+
+        // ---- Tratamientos ----
+        Treatment treatment1 = new Treatment(animal, elena,
+                LocalDateTime.of(2026, 8, 19, 9, 0), TreatmentType.WOUND_CARE,
+                "Cleaning of left front flipper");
+        Treatment treatment2 = new Treatment(animal, elena,
+                LocalDateTime.of(2026, 8, 19, 11, 0), TreatmentType.HYDRATION,
+                "Subcutaneous fluid therapy");
+        treatmentRepository.saveAll(List.of(treatment1, treatment2));
+
+        // ---- Consulta 1: ¿existe el caso RES-2026-100? ----
+        assertThat(rescueCaseRepository.existsByCaseCode("RES-2026-100")).isTrue();
+
+        // ---- Consulta 2: casos IN_REHABILITATION ----
+        assertThat(rescueCaseRepository.findByStatusOrderByRescueDateAsc(RescueStatus.IN_REHABILITATION))
+                .extracting(RescueCase::getCaseCode)
+                .contains("RES-2026-100");
+
+        // ---- Consulta 3: animales de DB-CAR ----
+        assertThat(animalRepository.findByRescueCaseRescueCenterCode("DB-CAR"))
+                .extracting(Animal::getAnimalCode)
+                .contains("AN-2026-100");
+
+        // ---- Consulta 4: animales cuyo nombre común contiene "turtle" (ignorando mayúsculas) ----
+        assertThat(animalRepository.findByCommonNameContainingIgnoreCase("turtle"))
+                .extracting(Animal::getAnimalCode)
+                .contains("AN-2026-100");
+
+        // ---- Consulta 5: especialistas con experiencia en Trauma ----
+        assertThat(specialistRepository.findActiveByExpertise("Trauma"))
+                .extracting(Specialist::getProfessionalCode)
+                .contains("SPEC-001");
+
+        // ---- Consulta 6: tratamientos de AN-2026-100, cronológicamente ----
+        assertThat(treatmentRepository.findByAnimalIdOrderByPerformedAtAsc(animal.getId()))
+                .extracting(Treatment::getDescription)
+                .containsExactly("Cleaning of left front flipper", "Subcutaneous fluid therapy");
+
+        // ---- Consulta 7: tratamientos de especialistas con experiencia en Rehabilitation ----
+        assertThat(treatmentRepository.findBySpecialistExpertise("Rehabilitation"))
+                .extracting(Treatment::getDescription)
+                .containsExactlyInAnyOrder("Cleaning of left front flipper", "Subcutaneous fluid therapy");
+
+        // ---- Consulta 8: tratamientos realizados entre dos fechas ----
+        assertThat(treatmentRepository.findTreatmentsBetweenDates(
+                LocalDateTime.of(2026, 8, 19, 0, 0),
+                LocalDateTime.of(2026, 8, 19, 23, 59)))
+                .hasSize(2);
+    }
 }

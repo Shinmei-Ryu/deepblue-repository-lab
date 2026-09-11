@@ -45,4 +45,14 @@ public interface TreatmentRepository extends JpaRepository<Treatment, Long> {
             """)
     List<Treatment> findTreatmentsBySpecialistExpertise(@Param("expertiseName") String expertiseName);
 
+    @Query("""
+            select distinct t
+            from Treatment t
+            join t.specialist s
+            join s.expertiseAreas e
+            where lower(e.name) = lower(:expertiseName)
+            order by t.performedAt asc
+            """)
+    List<Treatment> findBySpecialistExpertise(@Param("expertiseName") String expertiseName);
+
 }
