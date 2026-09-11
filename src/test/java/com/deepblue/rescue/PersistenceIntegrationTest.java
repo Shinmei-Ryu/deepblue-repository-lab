@@ -234,7 +234,7 @@ public class PersistenceIntegrationTest {
                 .containsExactly("Elena", "Sofia");
     }
 
-    // Test 9: insercion de tratamientos y jpql para intervalos
+    // Test 9: insercion de tratamientos y jpql para encontrar por id y ordenar
     @Test
     void treatmentsForAnimalShouldBeOrderedChronologically() {
         RescueCenter center = new RescueCenter("DB-TRT", "DeepBlue Treatment Center", "Santa Marta");
@@ -264,5 +264,36 @@ public class PersistenceIntegrationTest {
         assertThat(treatments)
                 .extracting(Treatment::getDescription)
                 .containsExactly("Treatment 1", "Treatment 2", "Treatment 3");
+    }
+
+    // Test 10:  JPQL para intervalos de fechas
+    @Test
+    void treatmentsBetweenDatesShouldReturnOnlyThoseWithinRange() {
+        RescueCenter center = new RescueCenter("DB-INT", "DeepBlue Interval Center", "Santa Marta");
+        rescueCenterRepository.save(center);
+
+        RescueCase rescueCase = new RescueCase("RES-INT-01", LocalDate.of(2026, 7, 1),
+                "Zona Y", RescueStatus.IN_REHABILITATION);
+        center.addCase(rescueCase);
+        Animal animal = new Animal("AN-INT-01", "Green Sea Turtle", "Chelonia mydas", AnimalSex.FEMALE);
+        rescueCase.assignAnimal(animal);
+        rescueCaseRepository.save(rescueCase);
+
+        Specialist elena = new Specialist("SPEC-930", "Elena", "Vargas", "elena.930@deepblue.org",true);
+        specialistRepository.save(elena);
+
+        treatmentRepository.saveAll(List.of(
+                new Treatment(animal, elena, LocalDateTime.of(2026, 8, 1, 10, 0), TreatmentType.WOUND_CARE, "Early"),
+                new Treatment(animal, elena, LocalDateTime.of(2026, 8, 10, 10, 0), TreatmentType.HYDRATION, "Middle"),
+                new Treatment(animal, elena, LocalDateTime.of(2026, 8, 20, 10, 0), TreatmentType.OBSERVATION, "Late")
+        ));
+
+        List<Treatment> result = treatmentRepository.findTreatmentsBetweenDates(
+                LocalDateTime.of(2026, 8, 5, 0, 0),
+                LocalDateTime.of(2026, 8, 15, 0, 0));
+
+        assertThat(result)
+                .extracting(Treatment::getDescription)
+                .containsExactly("Middle");
     }
 }
