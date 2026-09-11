@@ -50,6 +50,11 @@ public class Animal {
         this.sex = sex;
     }
 
+    public void assignMedicalRecord(MedicalRecord medicalRecord) {
+        this.medicalRecord = medicalRecord;
+        medicalRecord.setAnimal(this);
+    }
+
     public Long getId() {
         return id;
     }

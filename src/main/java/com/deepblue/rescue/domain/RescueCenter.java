@@ -34,6 +34,11 @@ public class RescueCenter {
         this.city = city;
     }
 
+    public void addCase(RescueCase rescueCase) {
+        this.cases.add(rescueCase);
+        rescueCase.setRescueCenter(this);
+    }
+
     public long getId() {
         return id;
     }

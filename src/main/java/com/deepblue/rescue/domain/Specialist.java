@@ -51,6 +51,11 @@ public class Specialist {
         this.active = active;
     }
 
+    public void addExpertise(Expertise expertise) {
+        this.expertiseAreas.add(expertise);
+        expertise.getSpecialists().add(this);
+    }
+
     public Long getId() {
         return id;
     }

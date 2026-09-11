@@ -47,6 +47,11 @@ public class RescueCase {
         this.status = status;
     }
 
+    public void assignAnimal(Animal animal) {
+        this.animal = animal;
+        animal.setRescueCase(this);
+    }
+
     public long getId() {
         return id;
     }
