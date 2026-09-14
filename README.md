@@ -114,6 +114,7 @@ deepblue-rescue/
 │       └── V3__add_tracking_device_to_animal.sql
 └── src/test/java/com/deepblue/rescue/
     ├── DeepblueRescueApplicationTests.java
+    ├── PersistenceIntegrationTest.java
     ├── TestDeepblueRescueApplication.java
     └── TestcontainersConfiguration.java
 ```
