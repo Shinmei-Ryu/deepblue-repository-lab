@@ -352,6 +352,55 @@ class TreatmentServiceImplTest {
                 .save(any());
     }
 
+    //SOLICITUD INVALIDA 2
+
+    @Test
+    void shouldThrowBusinessRuleExceptionWhenRescueCaseIsReleasedChallenge() {
+
+        RescueCase rescueCase = new RescueCase(
+                "RES-2026-100",
+                LocalDate.of(2026, 8, 20),
+                "Santa Marta Bay",
+                RescueStatus.RELEASED
+        );
+
+        Animal animal = new Animal(
+                "AN-2026-100", "Green Sea Turtle", "Chelonia mydas", AnimalSex.FEMALE
+        );
+        rescueCase.assignAnimal(animal);
+
+        Specialist specialist = new Specialist(
+                "SPEC-001", "Elena", "Vargas", "elena.vargas@deepblue.org", true
+        );
+
+        CreateTreatmentRequest request = new CreateTreatmentRequest(
+                "AN-2026-100",
+                "SPEC-001",
+                LocalDateTime.of(2026, 8, 21, 9, 0),
+                TreatmentType.OBSERVATION,
+                "Routine check after release."
+        );
+
+        when(
+                animalRepository.findByAnimalCode("AN-2026-100")
+        ).thenReturn(
+                Optional.of(animal)
+        );
+
+        when(
+                specialistRepository.findByProfessionalCode("SPEC-001")
+        ).thenReturn(
+                Optional.of(specialist)
+        );
+
+        assertThatThrownBy(
+                () -> service.register(request)
+        ).isInstanceOf(BusinessRuleException.class);
+
+        verify(treatmentRepository, never())
+                .save(any());
+    }
+
 
 }
 
