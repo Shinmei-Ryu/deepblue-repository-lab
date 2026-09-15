@@ -177,5 +177,52 @@ class TreatmentServiceImplTest {
         verify(treatmentRepository, never())
                 .save(any());
     }
+
+    @Test
+    void shouldThrowBusinessRuleExceptionWhenAnimalIsReleased() {
+
+        RescueCase rescueCase = new RescueCase(
+                "RES-001",
+                LocalDate.of(2026, 8, 20),
+                "Santa Marta Bay",
+                RescueStatus.RELEASED
+        );
+
+        Animal animal = new Animal(
+                "AN-001", "Green Sea Turtle", "Chelonia mydas", AnimalSex.FEMALE
+        );
+        rescueCase.assignAnimal(animal);
+
+        Specialist specialist = new Specialist(
+                "SPEC-001", "Elena", "Vargas", "elena.vargas@deepblue.org", true
+        );
+
+        CreateTreatmentRequest request = new CreateTreatmentRequest(
+                "AN-001",
+                "SPEC-001",
+                LocalDateTime.of(2026, 8, 21, 9, 0),
+                TreatmentType.OBSERVATION,
+                "Routine check after release preparation."
+        );
+
+        when(
+                animalRepository.findByAnimalCode("AN-001")
+        ).thenReturn(
+                Optional.of(animal)
+        );
+
+        when(
+                specialistRepository.findByProfessionalCode("SPEC-001")
+        ).thenReturn(
+                Optional.of(specialist)
+        );
+
+        assertThatThrownBy(
+                () -> service.register(request)
+        ).isInstanceOf(BusinessRuleException.class);
+
+        verify(treatmentRepository, never())
+                .save(any());
+    }
 }
 
