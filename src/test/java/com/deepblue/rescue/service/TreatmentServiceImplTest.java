@@ -227,6 +227,7 @@ class TreatmentServiceImplTest {
 
     //RETO INTEGRADOR
 
+    //SOLICITUD DE VALIDACION
     @Test
     void shouldRegisterTreatmentForIntegratorChallengeScenario() {
 
@@ -301,5 +302,56 @@ class TreatmentServiceImplTest {
         verify(treatmentRepository)
                 .save(any(Treatment.class));
     }
+
+    // SOLICITUD INVALIDA 1
+
+    @Test
+    void shouldThrowBusinessRuleExceptionWhenTreatmentDateIsBeforeRescueDateChallenge() {
+
+        RescueCase rescueCase = new RescueCase(
+                "RES-2026-100",
+                LocalDate.of(2026, 8, 20),
+                "Santa Marta Bay",
+                RescueStatus.IN_REHABILITATION
+        );
+
+        Animal animal = new Animal(
+                "AN-2026-100", "Green Sea Turtle", "Chelonia mydas", AnimalSex.FEMALE
+        );
+        rescueCase.assignAnimal(animal);
+
+        Specialist specialist = new Specialist(
+                "SPEC-001", "Elena", "Vargas", "elena.vargas@deepblue.org", true
+        );
+
+        CreateTreatmentRequest request = new CreateTreatmentRequest(
+                "AN-2026-100",
+                "SPEC-001",
+                LocalDateTime.of(2026, 8, 15, 9, 0),
+                TreatmentType.WOUND_CARE,
+                "Cleaning of left front flipper injury."
+        );
+
+        when(
+                animalRepository.findByAnimalCode("AN-2026-100")
+        ).thenReturn(
+                Optional.of(animal)
+        );
+
+        when(
+                specialistRepository.findByProfessionalCode("SPEC-001")
+        ).thenReturn(
+                Optional.of(specialist)
+        );
+
+        assertThatThrownBy(
+                () -> service.register(request)
+        ).isInstanceOf(BusinessRuleException.class);
+
+        verify(treatmentRepository, never())
+                .save(any());
+    }
+
+
 }
 
