@@ -2,6 +2,7 @@ package com.deepblue.rescue.service;
 
 import com.deepblue.rescue.domain.RescueCase;
 import com.deepblue.rescue.domain.RescueStatus;
+import com.deepblue.rescue.dto.request.ChangeRescueStatusRequest;
 import com.deepblue.rescue.dto.response.RescueCaseResponse;
 import com.deepblue.rescue.exception.ResourceNotFoundException;
 import com.deepblue.rescue.mapper.RescueCaseMapper;
@@ -95,6 +96,59 @@ class RescueCaseServiceImplTest {
 
         verify(mapper, never())
                 .toResponse(any());
+    }
+
+    @Test
+    void shouldChangeStatusWhenTransitionIsValid() {
+
+        RescueCase rescueCase = new RescueCase(
+                "RES-001",
+                LocalDate.of(2026, 8, 20),
+                "Santa Marta Bay",
+                RescueStatus.ADMITTED
+        );
+
+        ChangeRescueStatusRequest request = new ChangeRescueStatusRequest(
+                RescueStatus.UNDER_EVALUATION
+        );
+
+        RescueCaseResponse response = new RescueCaseResponse(
+                rescueCase.getId(),
+                rescueCase.getCaseCode(),
+                rescueCase.getRescueDate(),
+                rescueCase.getRescueLocation(),
+                RescueStatus.UNDER_EVALUATION,
+                "CENTER-01",
+                "AN-001"
+        );
+
+        when(
+                repository.findByCaseCode("RES-001")
+        ).thenReturn(
+                Optional.of(rescueCase)
+        );
+
+        when(
+                repository.save(rescueCase)
+        ).thenReturn(
+                rescueCase
+        );
+
+        when(
+                mapper.toResponse(rescueCase)
+        ).thenReturn(response);
+
+        RescueCaseResponse result =
+                service.changeStatus("RES-001", request);
+
+        assertThat(result)
+                .isEqualTo(response);
+
+        assertThat(rescueCase.getStatus())
+                .isEqualTo(RescueStatus.UNDER_EVALUATION);
+
+        verify(repository)
+                .save(rescueCase);
     }
 
 }
