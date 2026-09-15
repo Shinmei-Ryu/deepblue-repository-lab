@@ -3,6 +3,7 @@ package com.deepblue.rescue.service;
 import com.deepblue.rescue.domain.RescueCase;
 import com.deepblue.rescue.domain.RescueStatus;
 import com.deepblue.rescue.dto.response.RescueCaseResponse;
+import com.deepblue.rescue.exception.ResourceNotFoundException;
 import com.deepblue.rescue.mapper.RescueCaseMapper;
 import com.deepblue.rescue.repository.RescueCaseRepository;
 import com.deepblue.rescue.service.impl.RescueCaseServiceImpl;
@@ -17,8 +18,8 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -74,6 +75,26 @@ class RescueCaseServiceImplTest {
 
         verify(mapper)
                 .toResponse(rescueCase);
+    }
+
+    @Test
+    void shouldThrowResourceNotFoundExceptionWhenRescueCaseDoesNotExist() {
+
+        when(
+                repository.findByCaseCode("RES-999")
+        ).thenReturn(
+                Optional.empty()
+        );
+
+        assertThatThrownBy(
+                () -> service.findByCode("RES-999")
+        ).isInstanceOf(ResourceNotFoundException.class);
+
+        verify(repository)
+                .findByCaseCode("RES-999");
+
+        verify(mapper, never())
+                .toResponse(any());
     }
 
 }
