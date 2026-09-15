@@ -9,6 +9,7 @@ import com.deepblue.rescue.domain.Treatment;
 import com.deepblue.rescue.domain.TreatmentType;
 import com.deepblue.rescue.dto.request.CreateTreatmentRequest;
 import com.deepblue.rescue.dto.response.TreatmentResponse;
+import com.deepblue.rescue.exception.BusinessRuleException;
 import com.deepblue.rescue.mapper.TreatmentMapper;
 import com.deepblue.rescue.repository.AnimalRepository;
 import com.deepblue.rescue.repository.SpecialistRepository;
@@ -27,9 +28,9 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class TreatmentServiceImplTest {
@@ -129,4 +130,52 @@ class TreatmentServiceImplTest {
         verify(treatmentRepository)
                 .save(any(Treatment.class));
     }
+
+    @Test
+    void shouldThrowBusinessRuleExceptionWhenSpecialistIsInactive() {
+
+        RescueCase rescueCase = new RescueCase(
+                "RES-001",
+                LocalDate.of(2026, 8, 20),
+                "Santa Marta Bay",
+                RescueStatus.IN_REHABILITATION
+        );
+
+        Animal animal = new Animal(
+                "AN-001", "Green Sea Turtle", "Chelonia mydas", AnimalSex.FEMALE
+        );
+        rescueCase.assignAnimal(animal);
+
+        Specialist specialist = new Specialist(
+                "SPEC-001", "Elena", "Vargas", "elena.vargas@deepblue.org", false
+        );
+
+        CreateTreatmentRequest request = new CreateTreatmentRequest(
+                "AN-001",
+                "SPEC-001",
+                LocalDateTime.of(2026, 8, 21, 9, 0),
+                TreatmentType.WOUND_CARE,
+                "Cleaning of left front flipper injury."
+        );
+
+        when(
+                animalRepository.findByAnimalCode("AN-001")
+        ).thenReturn(
+                Optional.of(animal)
+        );
+
+        when(
+                specialistRepository.findByProfessionalCode("SPEC-001")
+        ).thenReturn(
+                Optional.of(specialist)
+        );
+
+        assertThatThrownBy(
+                () -> service.register(request)
+        ).isInstanceOf(BusinessRuleException.class);
+
+        verify(treatmentRepository, never())
+                .save(any());
+    }
 }
+
