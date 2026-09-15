@@ -14,6 +14,11 @@ import java.util.List;
 @Repository
 public interface TreatmentRepository extends JpaRepository<Treatment, Long> {
 
+    List<Treatment>
+    findByAnimalAnimalCodeOrderByPerformedAtAsc(
+            String animalCode);
+
+
     List<Treatment> findByAnimalIdOrderByPerformedAtAsc(Long animalId);
 
     @Query("""
