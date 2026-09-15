@@ -224,5 +224,82 @@ class TreatmentServiceImplTest {
         verify(treatmentRepository, never())
                 .save(any());
     }
+
+    //RETO INTEGRADOR
+
+    @Test
+    void shouldRegisterTreatmentForIntegratorChallengeScenario() {
+
+        RescueCase rescueCase = new RescueCase(
+                "RES-2026-100",
+                LocalDate.of(2026, 8, 20),
+                "Santa Marta Bay",
+                RescueStatus.IN_REHABILITATION
+        );
+
+        Animal animal = new Animal(
+                "AN-2026-100", "Green Sea Turtle", "Chelonia mydas", AnimalSex.FEMALE
+        );
+        rescueCase.assignAnimal(animal);
+
+        Specialist specialist = new Specialist(
+                "SPEC-001", "Elena", "Vargas", "elena.vargas@deepblue.org", true
+        );
+
+        CreateTreatmentRequest request = new CreateTreatmentRequest(
+                "AN-2026-100",
+                "SPEC-001",
+                LocalDateTime.of(2026, 8, 21, 9, 0),
+                TreatmentType.WOUND_CARE,
+                "Cleaning of left front flipper injury."
+        );
+
+        Treatment savedTreatment = new Treatment(
+                animal,
+                specialist,
+                request.performedAt(),
+                request.type(),
+                request.description()
+        );
+
+        TreatmentResponse response = new TreatmentResponse(
+                savedTreatment.getId(),
+                animal.getAnimalCode(),
+                specialist.getProfessionalCode(),
+                request.performedAt(),
+                request.type(),
+                request.description()
+        );
+
+        when(
+                animalRepository.findByAnimalCode("AN-2026-100")
+        ).thenReturn(
+                Optional.of(animal)
+        );
+
+        when(
+                specialistRepository.findByProfessionalCode("SPEC-001")
+        ).thenReturn(
+                Optional.of(specialist)
+        );
+
+        when(
+                treatmentRepository.save(any(Treatment.class))
+        ).thenReturn(
+                savedTreatment
+        );
+
+        when(
+                mapper.toResponse(savedTreatment)
+        ).thenReturn(response);
+
+        TreatmentResponse result = service.register(request);
+
+        assertThat(result)
+                .isEqualTo(response);
+
+        verify(treatmentRepository)
+                .save(any(Treatment.class));
+    }
 }
 
