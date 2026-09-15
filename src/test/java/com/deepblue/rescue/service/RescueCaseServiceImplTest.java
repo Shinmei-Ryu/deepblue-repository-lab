@@ -4,6 +4,7 @@ import com.deepblue.rescue.domain.RescueCase;
 import com.deepblue.rescue.domain.RescueStatus;
 import com.deepblue.rescue.dto.request.ChangeRescueStatusRequest;
 import com.deepblue.rescue.dto.response.RescueCaseResponse;
+import com.deepblue.rescue.exception.BusinessRuleException;
 import com.deepblue.rescue.exception.ResourceNotFoundException;
 import com.deepblue.rescue.mapper.RescueCaseMapper;
 import com.deepblue.rescue.repository.RescueCaseRepository;
@@ -149,6 +150,34 @@ class RescueCaseServiceImplTest {
 
         verify(repository)
                 .save(rescueCase);
+    }
+
+    @Test
+    void shouldThrowBusinessRuleExceptionWhenTransitionIsInvalid() {
+
+        RescueCase rescueCase = new RescueCase(
+                "RES-001",
+                LocalDate.of(2026, 8, 20),
+                "Santa Marta Bay",
+                RescueStatus.ADMITTED
+        );
+
+        ChangeRescueStatusRequest request = new ChangeRescueStatusRequest(
+                RescueStatus.READY_FOR_RELEASE
+        );
+
+        when(
+                repository.findByCaseCode("RES-001")
+        ).thenReturn(
+                Optional.of(rescueCase)
+        );
+
+        assertThatThrownBy(
+                () -> service.changeStatus("RES-001", request)
+        ).isInstanceOf(BusinessRuleException.class);
+
+        verify(repository, never())
+                .save(any());
     }
 
 }
