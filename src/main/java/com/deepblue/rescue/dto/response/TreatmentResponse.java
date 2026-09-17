@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 public record TreatmentResponse(
 
-        long id,
+        Long id,
 
         String animalCode,
 
