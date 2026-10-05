@@ -15,13 +15,10 @@ import java.util.List;
 @RequestMapping("/api/animals")
 public class AnimalController {
     private final AnimalService animalService;
-    private final TreatmentService
-            treatmentService;
+
     public AnimalController(
-            AnimalService animalService,
-            TreatmentService treatmentService) {
+            AnimalService animalService) {
         this.animalService = animalService;
-        this.treatmentService = treatmentService;
     }
 
     @GetMapping("/{animalCode}")
