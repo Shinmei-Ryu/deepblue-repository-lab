@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/treatments")
 public class TreatmentController {
-    private final TreatmentService service;
+    private final TreatmentService treatmentService;
     public TreatmentController(
-            TreatmentService service) {
-        this.service = service;
+            TreatmentService treatmentService) {
+        this.treatmentService = treatmentService;
     }
 
     @PostMapping
@@ -27,7 +27,7 @@ public class TreatmentController {
             @RequestBody
             CreateTreatmentRequest request) {
         TreatmentResponse response =
-                service.register(request);
+                treatmentService.register(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(response);
