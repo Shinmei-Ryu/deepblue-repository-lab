@@ -1,12 +1,12 @@
 package com.deepblue.rescue.controller;
 
+import com.deepblue.rescue.domain.RescueStatus;
 import com.deepblue.rescue.dto.response.RescueCaseResponse;
 import com.deepblue.rescue.service.RescueCaseService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/rescue-cases")
@@ -23,6 +23,15 @@ public class RescueCaseController {
             @PathVariable String caseCode) {
         return ResponseEntity.ok(
                 service.findByCode(caseCode)
+        );
+    }
+
+    @GetMapping
+    public ResponseEntity<List<RescueCaseResponse>>
+    findByStatus(
+            @RequestParam RescueStatus status) {
+        return ResponseEntity.ok(
+                service.findByStatus(status)
         );
     }
 }
