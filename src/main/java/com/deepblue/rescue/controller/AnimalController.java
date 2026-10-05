@@ -1,6 +1,7 @@
 package com.deepblue.rescue.controller;
 
 import com.deepblue.rescue.dto.response.AnimalResponse;
+import com.deepblue.rescue.dto.response.TreatmentEligibilityResponse;
 import com.deepblue.rescue.service.AnimalService;
 import com.deepblue.rescue.service.TreatmentService;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +39,26 @@ public class AnimalController {
                         .findAnimalsInRehabilitation()
         );
     }
+
+    @GetMapping(
+            "/{animalCode}/treatment-eligibility"
+    )
+    public ResponseEntity<TreatmentEligibilityResponse>
+    canReceiveTreatment(
+            @PathVariable String animalCode) {
+        boolean eligible =
+                animalService
+                        .canReceiveTreatment(
+                                animalCode
+                        );
+        return ResponseEntity.ok(
+                new TreatmentEligibilityResponse(
+                        animalCode,
+                        eligible
+                )
+        );
+    }
+
 
 
 }
