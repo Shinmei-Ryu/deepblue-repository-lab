@@ -33,5 +33,27 @@ public class GlobalExceptionHandler {
                 .body(error);
     }
 
+    @ExceptionHandler(
+            BusinessRuleException.class
+    )
+    public ResponseEntity<ErrorResponse>
+    handleBusinessRule(
+            BusinessRuleException ex) {
+        HttpStatus status =
+                HttpStatus.CONFLICT;
+        ErrorResponse error =
+                new ErrorResponse(
+                        LocalDateTime.now(),
+                        status.value(),
+                        status.getReasonPhrase(),
+                        ex.getMessage(),
+                        Map.of()
+                );
+        return ResponseEntity
+                .status(status)
+                .body(error);
+    }
+
+
 
 }
