@@ -3,7 +3,6 @@ package com.deepblue.rescue.controller;
 import com.deepblue.rescue.dto.response.AnimalResponse;
 import com.deepblue.rescue.dto.response.TreatmentEligibilityResponse;
 import com.deepblue.rescue.service.AnimalService;
-import com.deepblue.rescue.service.TreatmentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
