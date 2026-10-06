@@ -8,6 +8,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -114,6 +115,35 @@ public class GlobalExceptionHandler {
                 .body(error);
     }
 
+    @ExceptionHandler(
+            MethodArgumentTypeMismatchException.class
+    )
+    public ResponseEntity<ErrorResponse>
+    handleTypeMismatch(
+            MethodArgumentTypeMismatchException ex) {
+        HttpStatus status =
+                HttpStatus.BAD_REQUEST;
+        Map<String, String> details =
+                Map.of(
+                        ex.getName(),
+                        "Invalid value: "
+                                + String.valueOf(
+                                ex.getValue()
+                        )
+                );
+        ErrorResponse error =
+                new ErrorResponse(
+                        LocalDateTime.now(),
+                        status.value(),
+                        status.getReasonPhrase(),
+                        "Invalid request parameter",
+                        details
+                );
+
+        return ResponseEntity
+                .status(status)
+                .body(error);
+    }
 
 
 }
