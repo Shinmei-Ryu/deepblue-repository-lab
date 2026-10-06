@@ -145,5 +145,26 @@ public class GlobalExceptionHandler {
                 .body(error);
     }
 
+    @ExceptionHandler(
+            Exception.class
+    )
+    public ResponseEntity<ErrorResponse>
+    handleUnexpectedException(
+            Exception ex) {
+        HttpStatus status =
+                HttpStatus.INTERNAL_SERVER_ERROR;
+        ErrorResponse error =
+                new ErrorResponse(
+                        LocalDateTime.now(),
+                        status.value(),
+                        status.getReasonPhrase(),
+                        "An unexpected error occurred",
+                        Map.of()
+                );
+        return ResponseEntity
+                .status(status)
+                .body(error);
+    }
+
 
 }
