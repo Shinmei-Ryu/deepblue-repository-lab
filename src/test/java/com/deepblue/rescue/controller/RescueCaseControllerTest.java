@@ -2,14 +2,17 @@ package com.deepblue.rescue.controller;
 
 
 import com.deepblue.rescue.domain.RescueStatus;
+import com.deepblue.rescue.dto.request.ChangeRescueStatusRequest;
 import com.deepblue.rescue.dto.response.RescueCaseResponse;
 import com.deepblue.rescue.exception.GlobalExceptionHandler;
 import com.deepblue.rescue.exception.ResourceNotFoundException;
 import com.deepblue.rescue.service.RescueCaseService;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -17,8 +20,10 @@ import java.time.LocalDate;
 import java.util.List;
 
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -158,6 +163,30 @@ class RescueCaseControllerTest {
                 .andExpect(jsonPath("$.details.status").exists());
 
         verify(service, never()).findByStatus(any(RescueStatus.class));
+    }
+
+    @Test
+    void shouldChangeStatus() throws Exception {
+        // ARRANGE
+        when(service.changeStatus(eq("RES-001"), any(ChangeRescueStatusRequest.class)))
+                .thenReturn(rescueCase("RES-001", RescueStatus.READY_FOR_RELEASE));
+
+        // ACT + ASSERT
+        mockMvc.perform(patch("/api/rescue-cases/{code}/status", "RES-001")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "status": "READY_FOR_RELEASE"
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.caseCode").value("RES-001"))
+                .andExpect(jsonPath("$.status").value("READY_FOR_RELEASE"));
+
+        ArgumentCaptor<ChangeRescueStatusRequest> captor =
+                ArgumentCaptor.forClass(ChangeRescueStatusRequest.class);
+        verify(service).changeStatus(eq("RES-001"), captor.capture());
+        assertThat(captor.getValue().status()).isEqualTo(RescueStatus.READY_FOR_RELEASE);
     }
 
     // ------------------------------------------------------------------
