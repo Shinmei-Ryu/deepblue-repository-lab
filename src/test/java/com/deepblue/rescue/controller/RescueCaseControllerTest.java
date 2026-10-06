@@ -17,8 +17,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -145,6 +144,20 @@ class RescueCaseControllerTest {
                 .andExpect(jsonPath("$[1].status").value("IN_REHABILITATION"));
 
         verify(service).findByStatus(RescueStatus.IN_REHABILITATION);
+    }
+
+    @Test
+    void shouldReturn400WhenStatusQueryParamIsInvalid() throws Exception {
+        // ACT + ASSERT
+        mockMvc.perform(get("/api/rescue-cases").param("status", "FLYING"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").value("Invalid request parameter"))
+                .andExpect(jsonPath("$.details.status").exists());
+
+        verify(service, never()).findByStatus(any(RescueStatus.class));
     }
 
     // ------------------------------------------------------------------
