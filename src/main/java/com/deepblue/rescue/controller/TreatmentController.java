@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/treatments")
+@RequestMapping("/api")
 public class TreatmentController {
     private final TreatmentService treatmentService;
     public TreatmentController(
@@ -19,7 +19,7 @@ public class TreatmentController {
         this.treatmentService = treatmentService;
     }
 
-    @PostMapping
+    @PostMapping("/treatments")
     public ResponseEntity<TreatmentResponse>
     register(
             @Valid
@@ -33,7 +33,7 @@ public class TreatmentController {
     }
 
 
-    @GetMapping("/{animalCode}/treatments")
+    @GetMapping("/animals/{animalCode}/treatments")
     public ResponseEntity<List<TreatmentResponse>>
     findTreatments(
             @PathVariable String animalCode) {
