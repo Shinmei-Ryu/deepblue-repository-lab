@@ -14,6 +14,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
+import java.util.List;
 
 
 import static org.mockito.Mockito.verify;
@@ -125,6 +126,40 @@ class RescueCaseControllerTest {
                         jsonPath("$.details")
                                 .isMap()
                 );
+    }
+
+    @Test
+    void shouldReturnCasesByStatus() throws Exception {
+        // ARRANGE
+        when(service.findByStatus(RescueStatus.IN_REHABILITATION)).thenReturn(List.of(
+                rescueCase("RES-2026-001", RescueStatus.IN_REHABILITATION),
+                rescueCase("RES-2026-002", RescueStatus.IN_REHABILITATION)));
+
+        // ACT + ASSERT
+        mockMvc.perform(get("/api/rescue-cases").param("status", "IN_REHABILITATION"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].caseCode").value("RES-2026-001"))
+                .andExpect(jsonPath("$[0].status").value("IN_REHABILITATION"))
+                .andExpect(jsonPath("$[1].caseCode").value("RES-2026-002"))
+                .andExpect(jsonPath("$[1].status").value("IN_REHABILITATION"));
+
+        verify(service).findByStatus(RescueStatus.IN_REHABILITATION);
+    }
+
+    // ------------------------------------------------------------------
+    // Helpers
+    // ------------------------------------------------------------------
+
+    private RescueCaseResponse rescueCase(String caseCode, RescueStatus status) {
+        return new RescueCaseResponse(
+                1L,
+                caseCode,
+                LocalDate.of(2026, 8, 20),
+                "Bahia Concha",
+                status,
+                "DB-CAR",
+                "AN-2026-001");
     }
 
 
