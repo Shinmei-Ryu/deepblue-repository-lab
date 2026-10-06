@@ -4,6 +4,7 @@ package com.deepblue.rescue.controller;
 import com.deepblue.rescue.domain.RescueStatus;
 import com.deepblue.rescue.dto.response.RescueCaseResponse;
 import com.deepblue.rescue.exception.GlobalExceptionHandler;
+import com.deepblue.rescue.exception.ResourceNotFoundException;
 import com.deepblue.rescue.service.RescueCaseService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,6 +83,50 @@ class RescueCaseControllerTest {
                         "RES-2026-001"
                 );
     }
+
+    @Test
+    void shouldReturn404WhenCaseDoesNotExist()
+            throws Exception {
+        when(
+                service.findByCode("RES-999")
+        ).thenThrow(
+                new ResourceNotFoundException(
+                        "Rescue case not found: RES-999"
+                )
+        );
+        mockMvc.perform(
+                        get(
+                                "/api/rescue-cases/{code}",
+                                "RES-999"
+                        )
+                )
+                .andExpect(
+                        status().isNotFound()
+                )
+                .andExpect(
+                        jsonPath("$.timestamp")
+                                .exists()
+                )
+                .andExpect(
+                        jsonPath("$.status")
+                                .value(404)
+                )
+                .andExpect(
+                        jsonPath("$.error")
+                                .value("Not Found")
+                )
+                .andExpect(
+                        jsonPath("$.message")
+                                .value(
+                                        "Rescue case not found: RES-999"
+                                )
+                )
+                .andExpect(
+                        jsonPath("$.details")
+                                .isMap()
+                );
+    }
+
 
 
 }
