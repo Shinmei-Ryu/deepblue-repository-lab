@@ -81,7 +81,7 @@ class TreatmentControllerTest {
                                   "animalCode": "",
                                   "specialistCode": "",
                                   "type": null,
-                                  "description": ""
+                                  "description": null
                                 }
                                 """))
                 .andExpect(status().isBadRequest())
