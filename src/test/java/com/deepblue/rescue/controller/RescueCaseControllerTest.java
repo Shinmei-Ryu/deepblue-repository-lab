@@ -205,6 +205,24 @@ class RescueCaseControllerTest {
         verify(service, never()).changeStatus(anyString(), any());
     }
 
+    @Test
+    void shouldReturn400WhenStatusIsNull() throws Exception {
+        // ACT + ASSERT
+        mockMvc.perform(patch("/api/rescue-cases/{code}/status", "RES-001")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "status": null
+                                }
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("Request validation failed"))
+                .andExpect(jsonPath("$.details.status").value("Status is required"));
+
+        verify(service, never()).changeStatus(anyString(), any());
+    }
+
     // ------------------------------------------------------------------
     // Helpers
     // ------------------------------------------------------------------
