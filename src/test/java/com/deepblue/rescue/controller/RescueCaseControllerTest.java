@@ -248,6 +248,26 @@ class RescueCaseControllerTest {
         verify(service).changeStatus(eq("RES-001"), any(ChangeRescueStatusRequest.class));
     }
 
+    @Test
+    void shouldReturn400WhenStatusEnumValueIsInvalid() throws Exception {
+        // ACT + ASSERT
+        mockMvc.perform(patch("/api/rescue-cases/{code}/status", "RES-001")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "status": "FLYING"
+                                }
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").value("Malformed or invalid JSON request"))
+                .andExpect(jsonPath("$.details.body").exists());
+
+        verify(service, never()).changeStatus(anyString(), any());
+    }
+
     // ------------------------------------------------------------------
     // Helpers
     // ------------------------------------------------------------------
