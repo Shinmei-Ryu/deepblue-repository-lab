@@ -4,6 +4,7 @@ package com.deepblue.rescue.controller;
 import com.deepblue.rescue.domain.RescueStatus;
 import com.deepblue.rescue.dto.request.ChangeRescueStatusRequest;
 import com.deepblue.rescue.dto.response.RescueCaseResponse;
+import com.deepblue.rescue.exception.BusinessRuleException;
 import com.deepblue.rescue.exception.GlobalExceptionHandler;
 import com.deepblue.rescue.exception.ResourceNotFoundException;
 import com.deepblue.rescue.service.RescueCaseService;
@@ -221,6 +222,30 @@ class RescueCaseControllerTest {
                 .andExpect(jsonPath("$.details.status").value("Status is required"));
 
         verify(service, never()).changeStatus(anyString(), any());
+    }
+
+    @Test
+    void shouldReturn409WhenStatusTransitionIsInvalid() throws Exception {
+        // ARRANGE
+        when(service.changeStatus(eq("RES-001"), any()))
+                .thenThrow(new BusinessRuleException("Invalid status transition"));
+
+        // ACT + ASSERT
+        mockMvc.perform(patch("/api/rescue-cases/{code}/status", "RES-001")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "status": "RELEASED"
+                                }
+                                """))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.error").value("Conflict"))
+                .andExpect(jsonPath("$.message").value("Invalid status transition"))
+                .andExpect(jsonPath("$.details").isMap());
+
+        verify(service).changeStatus(eq("RES-001"), any(ChangeRescueStatusRequest.class));
     }
 
     // ------------------------------------------------------------------
