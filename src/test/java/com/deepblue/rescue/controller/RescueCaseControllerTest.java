@@ -268,6 +268,22 @@ class RescueCaseControllerTest {
         verify(service, never()).changeStatus(anyString(), any());
     }
 
+    @Test
+    void shouldReturn500WhenUnexpectedErrorOccurs() throws Exception {
+        // ARRANGE
+        when(service.findByCode("RES-2026-001"))
+                .thenThrow(new RuntimeException("internal failure details"));
+
+        // ACT + ASSERT
+        mockMvc.perform(get("/api/rescue-cases/{code}", "RES-2026-001"))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.status").value(500))
+                .andExpect(jsonPath("$.error").value("Internal Server Error"))
+                .andExpect(jsonPath("$.message").value("An unexpected error occurred"))
+                .andExpect(jsonPath("$.details").isMap());
+    }
+
     // ------------------------------------------------------------------
     // Helpers
     // ------------------------------------------------------------------
