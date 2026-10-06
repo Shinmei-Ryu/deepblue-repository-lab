@@ -189,6 +189,22 @@ class RescueCaseControllerTest {
         assertThat(captor.getValue().status()).isEqualTo(RescueStatus.READY_FOR_RELEASE);
     }
 
+    @Test
+    void shouldReturn400WhenStatusIsMissing() throws Exception {
+        // ACT + ASSERT
+        mockMvc.perform(patch("/api/rescue-cases/{code}/status", "RES-001")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").value("Request validation failed"))
+                .andExpect(jsonPath("$.details.status").value("Status is required"));
+
+        verify(service, never()).changeStatus(anyString(), any());
+    }
+
     // ------------------------------------------------------------------
     // Helpers
     // ------------------------------------------------------------------
