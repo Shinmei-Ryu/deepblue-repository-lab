@@ -8,3 +8,5 @@ export const changeCaseStatus = (caseCode, status) =>
         method: 'PATCH',
         body: JSON.stringify({ status }),
     })
+export const getCaseByCode = (caseCode) =>
+    request(`/api/rescue-cases/${caseCode}`)

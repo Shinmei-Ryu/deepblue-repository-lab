@@ -3,6 +3,7 @@ import ErrorMessage from './ErrorMessage'
 import TreatmentList from './TreatmentList'
 import ChangeStatus from './ChangeStatus'
 import TreatmentForm from './TreatmentForm'
+import StatusBadge from './StatusBadge'
 
 
 
@@ -14,7 +15,7 @@ export default function CaseDetail({ caseItem, onChanged }) {
             <section>
                 <h2>Caso {caseItem.caseCode}</h2>
                 <p>
-                    <strong>Estado:</strong> {caseItem.status} <br />
+                    <strong>Estado:</strong> <StatusBadge status={caseItem.status} /> <br />
                     <strong>Centro:</strong> {caseItem.centerCode} <br />
                     <strong>Lugar:</strong> {caseItem.rescueLocation} <br />
                     <strong>Fecha:</strong> {caseItem.rescueDate}
@@ -22,7 +23,7 @@ export default function CaseDetail({ caseItem, onChanged }) {
             </section>
 
             <ChangeStatus
-                key={caseItem.caseCode}
+                key={`${caseItem.caseCode}-${caseItem.status}`}
                 caseItem={caseItem}
                 onChanged={onChanged}
             />

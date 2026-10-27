@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useRescueCases } from '../hooks/useRescueCases'
+import { useNavigate, useMatch } from 'react-router-dom'
 import ErrorMessage from './ErrorMessage'
 
 export const STATUSES = [
@@ -11,8 +12,11 @@ export const STATUSES = [
     'CLOSED',
 ]
 
-export default function CaseList({ selected, onSelect }) {
+export default function CaseList() {
     const [status, setStatus] = useState('ADMITTED')
+    const navigate = useNavigate()
+    const match = useMatch('/cases/:caseCode')
+    const selectedCode = match?.params.caseCode
     const { data, isPending, isError, error } = useRescueCases(status)
 
     return (
@@ -37,8 +41,8 @@ export default function CaseList({ selected, onSelect }) {
             {data?.map((c) => (
                 <button
                     key={c.caseCode}
-                    className={`case-item ${selected?.caseCode === c.caseCode ? 'active' : ''}`}
-                    onClick={() => onSelect(c)}
+                    className={`case-item ${selectedCode === c.caseCode ? 'active' : ''}`}
+                    onClick={() => navigate(`/cases/${c.caseCode}`)}
                 >
                     <strong>{c.caseCode}</strong> — {c.rescueLocation}
                     <br />

@@ -1,12 +1,20 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { changeCaseStatus } from '../api/rescueCases'
-import { STATUSES } from './CaseList'
+
 import ErrorMessage from './ErrorMessage'
+
+const NEXT = {
+    ADMITTED: 'UNDER_EVALUATION',
+    UNDER_EVALUATION: 'IN_REHABILITATION',
+    IN_REHABILITATION: 'READY_FOR_RELEASE',
+    READY_FOR_RELEASE: 'RELEASED',
+}
 
 export default function ChangeStatus({ caseItem, onChanged }) {
     const queryClient = useQueryClient()
     const [next, setNext] = useState(caseItem.status)
+    const options = [caseItem.status, NEXT[caseItem.status]].filter(Boolean)
 
     const mutation = useMutation({
         mutationFn: (status) => changeCaseStatus(caseItem.caseCode, status),
@@ -24,7 +32,7 @@ export default function ChangeStatus({ caseItem, onChanged }) {
             <label>
                 Nuevo estado
                 <select value={next} onChange={(e) => setNext(e.target.value)}>
-                    {STATUSES.map((s) => (
+                    {options.map((s) => (
                         <option key={s} value={s}>
                             {s}
                         </option>
@@ -32,7 +40,10 @@ export default function ChangeStatus({ caseItem, onChanged }) {
                 </select>
             </label>
 
-            <button disabled={mutation.isPending} onClick={() => mutation.mutate(next)}>
+            <button
+                disabled={mutation.isPending || next === caseItem.status}
+                onClick={() => mutation.mutate(next)}
+            >
                 {mutation.isPending ? 'Aplicando...' : 'Aplicar'}
             </button>
 

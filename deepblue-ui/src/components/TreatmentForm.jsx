@@ -33,6 +33,7 @@ function formReducer(state, action) {
 export default function TreatmentForm({ animalCode }) {
     const [form, dispatch] = useReducer(formReducer, initialState)
     const mutation = useRegisterTreatment()
+    const descriptionTooShort = form.description.trim().length < 10
 
     const handleChange = (e) =>
         dispatch({ type: 'field', name: e.target.name, value: e.target.value })
@@ -88,9 +89,10 @@ export default function TreatmentForm({ animalCode }) {
                         value={form.description}
                         onChange={handleChange}
                     />
+                    {descriptionTooShort && <small>Mínimo 10 caracteres</small>}
                 </label>
 
-                <button type="submit" disabled={mutation.isPending}>
+                <button type="submit" disabled={mutation.isPending || descriptionTooShort}>
                     {mutation.isPending ? 'Guardando...' : 'Registrar'}
                 </button>
             </form>

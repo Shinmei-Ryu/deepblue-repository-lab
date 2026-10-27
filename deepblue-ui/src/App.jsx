@@ -1,21 +1,18 @@
-import { useState } from 'react'
+import { Routes, Route } from 'react-router-dom'
 import CaseList from './components/CaseList'
-import CaseDetail from './components/CaseDetail'
+import CasePage from './components/CasePage'
 
 export default function App() {
-  const [selected, setSelected] = useState(null)
-
-  return (
-      <>
-        <h1>DeepBlue Rescue</h1>
-        <main className="layout">
-          <CaseList selected={selected} onSelect={setSelected} />
-          {selected ? (
-              <CaseDetail caseItem={selected} onChanged={setSelected} />
-          ) : (
-              <p>Selecciona un caso</p>
-          )}
-        </main>
-      </>
-  )
+    return (
+        <>
+            <h1>DeepBlue Rescue</h1>
+            <main className="layout">
+                <CaseList />
+                <Routes>
+                    <Route path="/" element={<p>Selecciona un caso</p>} />
+                    <Route path="/cases/:caseCode" element={<CasePage />} />
+                </Routes>
+            </main>
+        </>
+    )
 }

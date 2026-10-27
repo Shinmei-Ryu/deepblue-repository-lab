@@ -45,4 +45,5 @@ button:disabled { opacity: .5; cursor: not-allowed; }
 
 table { width: 100%; border-collapse: collapse; font-size: .9rem; }
 th, td { text-align: left; padding: 6px; border-bottom: 1px solid #dde5ec; }
+.badge { color: white; padding: 2px 8px; border-radius: 12px; font-size: .75rem; font-weight: 700; }
 
